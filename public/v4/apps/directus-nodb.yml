@@ -16,13 +16,22 @@ services:
             DB_DATABASE: $$cap_postgres_database_name
             DB_USER: $$cap_postgres_user
             DB_PASSWORD: $$cap_postgres_passwd
+            DB_POOL__MIN: $$cap_db_pool_min
+            DB_POOL__IDLE_TIMEOUT_MILLIS: $$cap_db_pool_idle_timeout_millis
             CACHE_ENABLED: $$cap_cache_enabled
             CACHE_STORE: 'redis'
             REDIS_HOST: $$cap_redis_host
             REDIS_PASSWORD: $$cap_redis_password
-            REDIS_PORT: '6379'
+            REDIS_PORT: $$cap_redis_port
             ADMIN_EMAIL: $$cap_admin_email
             ADMIN_PASSWORD: $$cap_admin_password
+            EMAIL_FROM: $$cap_email_from
+            EMAIL_TRANSPORT: 'smtp'
+            EMAIL_SMTP_HOST: $$cap_email_smtp_host
+            EMAIL_SMTP_PORT: $$cap_email_smtp_port
+            EMAIL_SMTP_USER: $$cap_email_smtp_user
+            EMAIL_SMTP_PASSWORD: $$cap_email_smtp_password
+            EMAIL_SMTP_SECURE: $$cap_email_smtp_secure
         caproverExtra:
             containerHttpPort: '8055'
 caproverOneClickApp:
@@ -51,6 +60,16 @@ caproverOneClickApp:
           id: $$cap_postgres_passwd
           label: Postgres user password
           validRegex: /^(?=.*\d).{10,}$/
+        - description: Minimum number of database connections in the pool.
+          defaultValue: 0
+          id: $$cap_db_pool_min
+          label: Database pool min
+          validRegex: /^\d+$/
+        - description: Maximum number of milliseconds a connection can be idle before being released.
+          defaultValue: 3000
+          id: $$cap_db_pool_idle_timeout_millis
+          label: Database pool idle timeout millis
+          validRegex: /^\d+$/
         - description: Directus Auth Secret Key (must not be the same as Directus Auth Public Key)
           defaultValue: $$cap_gen_random_hex(16)
           id: $$cap_directus_auth_secret_key
@@ -71,14 +90,58 @@ caproverOneClickApp:
           id: $$cap_admin_password
           label: Directus admin user password
           validRegex: /^(?=.*\d).{8,}$/
+        - description: Cache enabled
+          id: $$cap_cache_enabled
+          label: Cache enabled
+          defaultValue: true
+          validRegex: /^(true|false)$/
+        - description: Cache store
+          id: $$cap_cache_store
+          label: Cache store
+          defaultValue: redis
+          validRegex: /.{1,}/
         - description: Host of the Directus database instance.
           id: $$cap_redis_host
           label: Redis host
-          defaultValue: redis:6379
-        - description: Redis Password
+          defaultValue: redis
+        - description: Host of the Directus database instance.
           id: $$cap_redis_password
-          label: Redis Password
-          validRegex: /^(\w|[^\s"])+$/
+          label: Redis host
+          defaultValue: redis
+        - description: Host of the Directus database instance.
+          id: $$cap_redis_port
+          label: Redis host
+          defaultValue: 6379
+        - description: Email address from which emails are sent.
+          id: $$cap_email_from
+          label: Email from
+          defaultValue: no-reply@example.com
+          validRegex: /.{1,}/
+        - description: SMTP host for sending emails.
+          id: $$cap_email_smtp_host
+          label: SMTP host
+          defaultValue: smtp.example.com
+          validRegex: /.{1,}/
+        - description: SMTP port for sending emails.
+          id: $$cap_email_smtp_port
+          label: SMTP port
+          defaultValue: 465
+          validRegex: /^\d+$/
+        - description: SMTP user for sending emails.
+          id: $$cap_email_smtp_user
+          label: SMTP user
+          defaultValue: user@example.com
+          validRegex: /.{1,}/
+        - description: SMTP password for sending emails.
+          id: $$cap_email_smtp_password
+          label: SMTP password
+          defaultValue: $$cap_gen_random_hex(16)
+          validRegex: /^(?=.*\d).{10,}$/
+        - description: SMTP secure for sending emails.
+          id: $$cap_email_smtp_secure
+          label: SMTP secure
+          defaultValue: true
+          validRegex: /^(true|false)$/
     instructions:
         end: >
             Aaaand you're done! 😄
